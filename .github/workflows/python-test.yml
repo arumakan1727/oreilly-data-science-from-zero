@@ -20,16 +20,11 @@ jobs:
           pip install pipenv
           pipenv install --dev
 
-      - name: Spawn shell within virtualenv
-        run: pipenv shell
-
       - name: Lint with flake8
         run: |
-          # Python 構文エラーまたは未定義の名前がある場合はビルドを停止する
-          flake8 . --count --select=E1,E9,F63,F7,F82 --show-source --statistics
+          pipenv run flake8_only_critical
+          pipenv run flake8_always_exit_zero
 
-          # exit-zeroはすべてのエラーを警告として扱う。 GitHubのエディタの幅は127文字
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      - run: pipenv run mypy_strict
 
-      - name: Test with doctest
-        run: ./doctest.bash ./ds_scratch
+      - run: ./doctest.bash ./ds_scratch
