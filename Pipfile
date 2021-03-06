@@ -13,3 +13,9 @@ mypy = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+flake8_only_critical = "flake8 ./ds_scratch --count --select=E1,E9,F63,F7,F82 --show-source --statistics"
+flake8_always_exit_zero = "flake8 ./ds_scratch --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics"
+doctest = "./doctest.bash ./ds_scratch"
+mypy_strict = "mypy --strict ./ds_scratch"
