@@ -13,3 +13,6 @@ mypy = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+doctest = "./doctest.bash ./ds_scratch"
