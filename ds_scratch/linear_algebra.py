@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import Callable, List, Tuple
 
 Vector = List[float]
 
@@ -119,3 +119,63 @@ def distance(v: Vector, w: Vector) -> float:
     5.0
     """
     return magnitude(subtract(v, w))
+
+
+Matrix = List[List[float]]
+
+
+def shape(A: Matrix) -> Tuple[int, int]:
+    """
+    A の行数と列数をその順で返す
+
+    >>> shape([[1, 2, 3], [4, 5, 6]])
+    (2, 3)
+    """
+    num_rows = len(A)
+    num_cols = len(A[0]) if A else 0
+    return num_rows, num_cols
+
+
+def get_row(A: Matrix, i: int) -> Vector:
+    """
+    A の i 行目をベクトルとして返す。
+
+    >>> get_row([[1, 2, 3], [4, 5, 6]], 0)
+    [1, 2, 3]
+    """
+    return A[i]
+
+
+def get_column(A: Matrix, j: int) -> Vector:
+    """
+    A の j 列目をベクトルとして返す。
+
+    >>> get_column([[1, 2, 3], [4, 5, 6]], 0)
+    [1, 4]
+    """
+    return [A_i[j] for A_i in A]
+
+
+def make_matrix(num_rows: int,
+                num_cols: int,
+                entry_fn: Callable[[int, int], float]) -> Matrix:
+    """
+    num_rows 行 num_cols 列の行列を生成する。
+    (i, j) の要素は、 entry_fn(i, j) が与える。
+
+    >>> make_matrix(2, 3, lambda i, j: i * 10 + j)
+    [[0, 1, 2], [10, 11, 12]]
+    """
+    return [[entry_fn(i, j)
+             for j in range(num_cols)]
+            for i in range(num_rows)]
+
+
+def identity_matrix(n: int) -> Matrix:
+    """
+    n x n の単位行列を生成する。
+
+    >>> identity_matrix(4)
+    [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+    """
+    return make_matrix(n, n, lambda i, j: 1 if i == j else 0)
