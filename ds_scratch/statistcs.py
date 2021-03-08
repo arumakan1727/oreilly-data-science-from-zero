@@ -1,6 +1,6 @@
 import math
 from typing import Counter, List
-from ds_scratch.linear_algebra import sum_of_squares
+from ds_scratch.linear_algebra import sum_of_squares, dot
 
 
 def mean(xs: List[float]) -> float:
@@ -86,6 +86,9 @@ def variance(xs: List[float]) -> float:
     """
     xs の不偏分散を返す。
     平均との差の二乗の 'おおよそ' の平均 (n ではなく n - 1 で割る)。
+
+    >>> variance([1, 7, 10]) == ((1 - 6)**2 + (7 - 6)**2 + (10 - 6)**2) / (3 - 1)
+    True
     """
     n = len(xs)
     assert n >= 2, "分散は少なくとも2つ以上の要素を必要とする"
@@ -97,6 +100,9 @@ def variance(xs: List[float]) -> float:
 def standard_deviation(xs: List[float]) -> float:
     """
     xs の標準偏差を求める。
+
+    >>> standard_deviation([1, 6, 10]) == math.sqrt(variance([1, 6, 10]))
+    True
     """
     return math.sqrt(variance(xs))
 
@@ -106,3 +112,27 @@ def interquartile_range(xs: List[float]) -> float:
     xs の四分位範囲 (75パーセンタイルと25パーセンタイルの差) を求める。
     """
     return quantile(xs, 0.75) - quantile(xs, 0.25)
+
+
+def covariance(xs: List[float], ys: List[float]) -> float:
+    """
+    xs と ys の共分散を求める。
+
+    >>> covariance([3, 4, 5], [3, 7, 8]) == (-1*-3 + 0*1 + 1*2) / (3 - 1)
+    True
+    """
+    assert len(xs) == len(ys), "xs と ys は同じ要素数でなければならない"
+
+    return dot(de_mean(xs), de_mean(ys)) / (len(xs) - 1)
+
+
+def correlation(xs: List[float], ys: List[float]) -> float:
+    """
+    xs と ys の相関係数を求める。
+    """
+    stdev_x = standard_deviation(xs)
+    stdev_y = standard_deviation(ys)
+    if stdev_x > 0 and stdev_y > 0:
+        return covariance(xs, ys) / (stdev_x * stdev_y)
+    else:
+        return 0  # 変動がなければ相関は0
