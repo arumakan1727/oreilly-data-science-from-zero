@@ -72,7 +72,7 @@ def normal_two_sided_bounds(prob: float, mu: float = 0, sigma: float = 1) -> Tup
 # 表が出る確率を p とする。
 # コインに歪みがないことを示す帰無仮説H_0は p = 0.5 であり、対立仮説H_1は p != 0.5 (=歪みがある) である。
 
-def _test1() -> None:
+def test1() -> None:
     # コインに歪みは無いという仮説が真であるなら、X は平均μ=500, 分散σ=15.8の正規分布で近似できる。
     mu_0, sigma_0 = normal_approximation_to_binomial(1000, 0.5)
 
@@ -120,14 +120,15 @@ def two_sided_p_value(x: float, mu: float = 0, sigma: float = 1) -> float:
     else:
         return 2 * normal_probability_below(x, mu, sigma)
 
+
 # 片側検定でp値を求める。
 upper_p_value = normal_probability_above
 lower_p_value = normal_probability_below
 
 
-def _test2() -> None:
+def test2() -> None:
     """
-    _test1() とは別の検定方法。
+    test1() とは別の検定方法。
     H_0が真であると仮定して、実際に観測された値と少なくとも同等に極端な値が生じる確率を求める。
     """
     # 表が530回出た場合、次の様に計算できる。
@@ -142,7 +143,7 @@ def _test2() -> None:
     assert math.isclose(p, 0.0463, rel_tol=1e-2)
 
     # 片側検定の場合、表が525回の場合は帰無仮説を棄却しない。
-    upper_p_value(525 - 0.5, mu_0, sigma_0) # 0.061
+    upper_p_value(525 - 0.5, mu_0, sigma_0)  # 0.061
 
     # しかし、527回ならば棄却することになる。
     upper_p_value(527 - 0.5, mu_0, sigma_0)
@@ -152,3 +153,38 @@ def _test2() -> None:
     # データがおよそ正規分布に従っていることを確かめる必要がある。
     # 正規分布であるかどうかを調べる統計手法は数多く存在するが、データをグラフ化するのが
     # 簡単で優れている (らしい)。
+
+
+def test3() -> None:
+    """
+    test1(), test2() とは別の3番目の手法。
+
+    表を1，裏を0とするベルヌーイ変数の平均をみることで歪みのあるコインに対する確率を推定できる。
+    1000回の試行で525回の表が出たとすると、pの推定値は0.525である。
+    この推定値がどの程度信頼できるか。
+    """
+    p_hat = 525 / 1000
+    mu = p_hat
+    sigma = math.sqrt(p_hat * (1 - p_hat) / 1000)  # 0.0158
+
+    # 正規分布の近似を使うと、pの正しい値が次の区間に入るのは「95%の確率で信頼できる」という結論になる。
+    # 0.5 はこの信頼区間内にあるため、コインに歪みがあるとは結論付けられない。
+    normal_two_sided_bounds(0.95, mu, sigma)  # [0.4940, 0.5560]
+
+    # 一方、表が540回出た場合の信頼区間は次の通りで、コインに歪みがないという仮説は成立しない。
+    p_hat = 540 / 1000
+    mu = p_hat
+    sigma = math.sqrt(p_hat * (1 - p_hat) / 1000)  # 0.0158
+    normal_two_sided_bounds(0.95, mu, sigma)  # [0.5091, 0.5709]
+
+
+def B(alpha: float, beta: float) -> float:
+    """
+    ベータ分布。
+    確率の総和が1となるように定数で正規化する。
+    """
+    return math.gamma(alpha) * math.gamma(beta) / math.gamma(alpha + beta)
+
+
+def beta_pdf(x: float, alpha: float, beta: float) -> float:
+    return x ** (alpha - 1) * (1 - x) ** (beta- 1) / B(alpha, beta)
