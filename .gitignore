@@ -1,6 +1,9 @@
 # VSCode dir
 .vscode/
 
+# Vim dir
+.vim/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
